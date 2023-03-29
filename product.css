@@ -25,9 +25,18 @@ button{
 }
 
 input[type="checkbox"] {
-    margin: 10px 5px;
+    margin: 15px 5px 5px;
+}
+
+#productSearch{
+    margin: 15px 5px 5px;
 }
 
 .price_search{
     margin-top: 10px;
+}
+
+table{
+    margin: auto;
+    width: 1100px;
 }
