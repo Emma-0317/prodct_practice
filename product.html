@@ -1,14 +1,14 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
     <link rel="stylesheet" href="product.css">
+    <title>前端綜合練習</title>
 </head>
 
 <body>
@@ -17,19 +17,23 @@
         <h1>XX產品清單/查詢</h1>
     </div>
     <div class="item">
+        <button id="listBtn">商品清單</button>
         <nav id="productSearch">
             <label for="productNumber">產品編號：</label>
-            <input type="text" id="productNumber" name="productNumber">
-            <button type="search">查詢</button>
+            <input type="text" id="numberPush">
+            <button type="submit" id="submit_search">查詢</button>
         </nav>
-        <form id="product_type">
-            <input type="checkbox" name="types" value="menu1">
-            <label for="menu1">3C</label>
-            <input type="checkbox" name="types" value="menu2">
-            <label for="menu2">飲料</label>
-            <input type="checkbox" name="types" value="menu3">
-            <label for="menu3">食品</label>
-        </form>
+        <div>
+            <label>
+                <input type="checkbox" name="type" value="3C" checked>3C
+            </label>
+            <label>
+                <input type="checkbox" name="type" value="飲料" checked>飲料
+            </label>
+            <label>
+                <input type="checkbox" name="type" value="食品" checked>食品
+            </label>
+        </div>
 
         <div class="price_search">
             <label for="price">價錢搜尋：</label>
@@ -43,9 +47,24 @@
         </div>
     </div>
     <hr />
+
+    <div id="check"></div>
     <div class="wrap">
-        <div class="table table-bordered table-striped" id="product_practice"></div>
+        <div class="table table-bordered table-striped" id="product_practice" hidden></div>
     </div>
+    <table id="productTable">
+        <thead>
+            <tr>
+                <!-- <th>產品編號</th>
+                <th>產品名稱</th>
+                <th>數量</th>
+                <th>價格</th>
+                <th>產品類型</th> -->
+            </tr>
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
 
     <!-- <thead>
             <tr>
@@ -76,6 +95,12 @@
 
         //初始表格
         const tableContainer = document.querySelector("#product_practice");
+        const priceproduct = document.querySelector("#price_product");
+        const listBtn = document.querySelector('#listBtn');
+        const tableBody = document.querySelector('#productTable tbody');
+        const checkboxes = document.querySelectorAll('input[type="checkbox"][name="type"]');
+
+        //塞到表格中
         const table = document.createElement("table");
         const headerRow = document.createElement("tr");
         const headerColumns = ["商品編號", "商品名稱", "數量", "價格", "商品類別"];
@@ -85,7 +110,6 @@
             headerRow.appendChild(column);
         });
         table.appendChild(headerRow);
-
         product.forEach(item => {
             const row = document.createElement("tr");
             row.innerHTML =
@@ -97,41 +121,53 @@
             table.appendChild(row);
         });
         tableContainer.appendChild(table);
-
-        //產品編號查詢
-        const nav = document.querySelector('nav');
-        nav.addEventListener('search', function (event) {
-            event.preventDefault();
-            const productNumber = document.querySelector('#productNumber').value;
-            const product = getProductByID(productNumber);
-            renderProduct(product);
+        //表格的顯示(奇數次顯示，偶數次隱藏)
+        tableContainer.hidden = true;
+        let clickCount = 0;
+        listBtn.addEventListener('click', () => {
+            clickCount++;
+            if (clickCount % 2 !== 0) {
+                tableContainer.hidden = false;
+            } else {
+                tableContainer.hidden = true;
+            }
         });
 
-        import productList from './product.js';
-        function getProductByNumber(productNumber){
-            const product = productList.find(item => item.productNumber === productNumber);
-            return product;
+        //商品搜尋text
+
+        //商品類型checkbox
+        function updateTable() {
+            tableBody.innerHTML = '';
+            // 取得勾選的產品類型
+            const checkedTypes = Array.from(checkboxes)
+                .filter(checkbox => checkbox.checked)
+                .map(checkbox => checkbox.value);
+            // 篩選
+            const filteredProduct = product.filter(p => checkedTypes.includes(p.ProductType));
+            // 將產品資料插入表格
+            filteredProduct.forEach(p => {
+                const row = tableBody.insertRow();
+                // row.innserCell().textContent = ["商品編號", "商品名稱", "數量", "價格", "商品類別"];
+                row.insertCell().textContent = p.ProductNumber;
+                row.insertCell().textContent = p.ProductName;
+                row.insertCell().textContent = p.Amount;
+                row.insertCell().textContent = p.Price;
+                row.insertCell().textContent = p.ProductType;
+            });
         }
+        //一開始不勾選且資料不顯示
+        updateTable();
+        checkboxes.forEach(checkbox => {
+            checkbox.checked = false;
+        });
+        updateTable();
+        checkboxes.forEach(checkbox => {
+            checkbox.addEventListener('change', updateTable);
+        });
 
-
-
-        //產品類型的checkbox
-        // const form = document.querySelector('for');
-        // form.addEventListener('submit', function (event) {
-        //     event.preventDefault();
-
-        //     const checkedValues = Array.from(form.querySelectorAll('input[type="checkbox"]:checked')).map(input => input.value);
-
-        //     const typesedList = originalList.types(item => checkedValues.includes(item.category));
-
-        //     renderList(typesedList);
-        // })
-
-
+        //商品價格查詢option
 
     </script>
-
-
 
 </body>
 
